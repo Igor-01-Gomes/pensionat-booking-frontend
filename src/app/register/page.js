@@ -12,12 +12,14 @@ export default function RegisterPage() {
     hashedPassword: "",
     phone: "",
   });
-
+  const [error, setError] = useState("");
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async () => {
+    setError("");
+    try{
     const response = await fetch("http://localhost:8081/api/customers", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -28,9 +30,12 @@ export default function RegisterPage() {
       alert("Account created successfully!");
       window.location.href = "/login";
     } else {
-      alert("Something went wrong, please try again.");
+      setError("Something went wrong, please try again.");
     }
-  };
+  } catch (error) { 
+    setError("Customer service is currently unavailable. Please try again later.");
+  }
+};
 
   return (
     <main>
@@ -120,6 +125,7 @@ export default function RegisterPage() {
             borderRadius: "4px",
           }}
         />
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <button
           onClick={handleSubmit}
           style={{
