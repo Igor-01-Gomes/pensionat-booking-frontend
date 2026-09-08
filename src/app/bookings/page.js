@@ -61,22 +61,40 @@ function BookingsContent() {
     loadData();
   }, []);
 
-  async function apiRequest(baseUrl, path, options = {}) {
-    const response = await fetch(`${baseUrl}${path}`, {
+async function apiRequest(baseUrl, path, options = {}) {
+  let response;
+
+  try {
+    response = await fetch(`${baseUrl}${path}`, {
       headers: {
         "Content-Type": "application/json",
         ...options.headers,
       },
       ...options,
     });
-
-    if (!response.ok) {
-      const message = await response.text();
-      throw new Error(message || "Request failed");
+  } catch (error) {
+    if (baseUrl === API_BOOKING_URL) {
+      throw new Error(
+        "Booking service is currently unavailable. Please try again later."
+      );
     }
 
-    return response.json();
+    if (baseUrl === API_CUSTOMER_URL) {
+      throw new Error(
+        "Customer service is currently unavailable. Please try again later."
+      );
+    }
+
+    throw error;
   }
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || "Request failed");
+  }
+
+  return response.json();
+}
 
   async function loadData() {
     try {

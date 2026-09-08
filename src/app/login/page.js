@@ -7,8 +7,11 @@ import { useState } from "react";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = async () => {
+    setError("");
+    try {
     const response = await fetch("http://localhost:8081/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -20,9 +23,12 @@ export default function LoginPage() {
       localStorage.setItem("customer", JSON.stringify(customer));
       window.location.href = "/";
     } else {
-      alert("Invalid email or password");
+      setError("Invalid email or password");
     }
-  };
+  } catch (error) {
+    setError("Customer service is currently unavailable. Please try again later.");
+  }
+};
 
   return (
     <main>
@@ -66,6 +72,7 @@ export default function LoginPage() {
             borderRadius: "4px",
           }}
         />
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <button
           onClick={handleLogin}
           style={{
